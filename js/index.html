@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="leibniz.js"></script>
+<script>
+    const t0 = performance.now();
+    const pi = jsCalcPi(1000000000);
+    const t1 = performance.now();
+    console.log(pi);
+    console.log(`Call to doSomething took ${t1 - t0} milliseconds.`);
+</script>
+</body>
+</html>

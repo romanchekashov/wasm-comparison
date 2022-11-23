@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h3>leibniz:</h3>
+<input id="leibniz" type="text" value="100000000" />
+<button id="run">Run</button>
+<div id="result" style="margin-top: 15px;"></div>
+
+<script src="js/leibniz.js"></script>
+<script>
+    console.log('JS ready!');
+
+    var goFun;
+    var rustFun;
+
+    var runFun = (lang, fun, rounds) => {
+        const t0 = performance.now();
+        fun(rounds);
+        const t1 = performance.now();
+
+        return {
+            lang, timeDiff: t1 - t0
+        };
+    }
+</script>
+
+<script type="module">
+    import init, { rustCalcPi } from "./rust/pkg/rust.js";
+
+    init().then(() => {
+        console.log('Rust ready!');
+
+        rustFun = rustCalcPi;
+    });
+</script>
+
+<script src="go/wasm_exec.js"></script>
+<script>
+    const go = new Go();
+
+    WebAssembly.instantiateStreaming(fetch("go/main.wasm"), go.importObject).then((result) => {
+        go.run(result.instance);
+
+        console.log('Go ready!');
+
+        goFun = goCalcPi;
+    });
+</script>
+
+<script>
+    document.getElementById("run").addEventListener("click", () => {
+        runLeibniz(+document.getElementById("leibniz").value);
+    });
+
+    function runLeibniz(rounds) {
+        document.getElementById("result").innerHTML = '';
+
+        setTimeout(() => appendToDom(runFun('JS', jsCalcPi, rounds)), 0);
+        setTimeout(() => appendToDom(runFun('Rust', rustFun, String(rounds))), 0);
+        setTimeout(() => appendToDom(runFun('Go', goFun, rounds)), 0);
+    }
+
+    function runArrayManipulations(rounds) {
+        runFun('JS', arrayManipulations, rounds);
+        runFun('Go', goArrayManipulations, rounds);
+    }
+
+    function withTimeout(func, timeout = 0) {
+        setTimeout(func, timeout);
+    }
+
+    function appendToDom({lang, timeDiff}) {
+        const time = Math.round((timeDiff * 100)) / 100;
+        const newDiv = document.createElement("div");
+        newDiv.appendChild(document.createTextNode(`${lang}: Call to doSomething took ${time} milliseconds.`));
+        document.getElementById("result").append(newDiv);
+    }
+</script>
+</body>
+</html>

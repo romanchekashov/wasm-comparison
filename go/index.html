@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="wasm_exec.js"></script>
+<script>
+    const go = new Go();
+    WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+        go.run(result.instance);
+
+        const t0 = performance.now();
+        const pi = goCalcPi(1000000000);
+        const t1 = performance.now();
+        console.log(pi);
+        console.log(`Call to doSomething took ${t1 - t0} milliseconds.`);
+    });
+</script>
+</body>
+</html>
